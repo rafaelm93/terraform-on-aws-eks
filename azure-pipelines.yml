@@ -7,12 +7,32 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-- script: echo Hello, World!
-  displayName: 'Print Hello, World!'
-
 - checkout: self
+
+- task: TerraformInstaller@0
+  inputs:
+    terraformVersion: '1.0.0'
+
+- script: |
+    cd 02-Terraform-Basics/02-02-Terraform-Command-Basics/terraform-manifests
+    terraform init \
+      -backend-config="access_key=$(awsAccessKey)" \
+      -backend-config="secret_key=$(awsSecretKey)" \
+      -backend-config="key=$(tfBackendKey)" \
+      -backend-config="region=us-west-2"
+  displayName: 'Terraform Init'
+
+- script: |
+    cd terraform
+    terraform plan -out=tfplan
+  displayName: 'Terraform Plan'
 
 - task: PublishPipelineArtifact@1
   inputs:
-    targetPath: '$(Build.ArtifactStagingDirectory)'
-    artifact: 'MyGitHubArtifact'
+    targetPath: 'terraform/tfplan'
+    artifact: 'TerraformPlan'
+
+- script: |
+    cd terraform
+    terraform apply -auto-approve tfplan
+  displayName: 'Terraform Apply'
