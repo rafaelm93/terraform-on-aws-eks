@@ -11,28 +11,27 @@ steps:
 
 - task: TerraformInstaller@0
   inputs:
-    terraformVersion: '1.0.0'
+    terraformVersion: 'latest'
 
-- script: |
-    cd 02-Terraform-Basics/02-02-Terraform-Command-Basics/terraform-manifests
-    terraform init \
-      -backend-config="access_key=$(awsAccessKey)" \
-      -backend-config="secret_key=$(awsSecretKey)" \
-      -backend-config="key=$(tfBackendKey)" \
-      -backend-config="region=us-west-2"
-  displayName: 'Terraform Init'
-
-- script: |
-    cd terraform
-    terraform plan -out=tfplan
-  displayName: 'Terraform Plan'
-
-- task: PublishPipelineArtifact@1
+- task: TerraformTaskV4@4
   inputs:
-    targetPath: 'terraform/tfplan'
-    artifact: 'TerraformPlan'
-
-- script: |
-    cd terraform
-    terraform apply -auto-approve tfplan
-  displayName: 'Terraform Apply'
+    provider: 'aws'
+    command: 'init'
+    workingDirectory: '02-Terraform-Basics/02-02-Terraform-Command-Basics/terraform-manifests/'
+    backendServiceAWS: 'aws-terraform-us-east-2'
+    backendAWSBucketName: 'infra-state-frcm'
+    backendAWSKey: 'ec2-state/ec2-state'
+- task: TerraformTaskV4@4
+  inputs:
+    provider: 'aws'
+    command: 'plan'
+    workingDirectory: '02-Terraform-Basics/02-02-Terraform-Command-Basics/terraform-manifests'
+    commandOptions: '-no-color'
+    environmentServiceNameAWS: 'Terraform-us-east-2'
+- task: TerraformTaskV4@4
+  inputs:
+    provider: 'aws'
+    command: 'apply'
+    workingDirectory: '02-Terraform-Basics/02-02-Terraform-Command-Basics/terraform-manifests'
+    commandOptions: '-auto-approve'
+    environmentServiceNameAWS: 'Terraform-us-east-2'
