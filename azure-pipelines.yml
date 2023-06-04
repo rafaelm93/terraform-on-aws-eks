@@ -14,7 +14,7 @@ steps:
     provider: 'aws'
     command: 'init'
     workingDirectory: '02-Terraform-Basics/02-02-Terraform-Command-Basics/terraform-manifests/'
-    backendServiceAWS: 'aws-terraform-us-east-2'
+    backendServiceAWS: 'aws-terraform-us-east-1-Plan'
     backendAWSBucketName: 'infra-state-frcm'
     backendAWSKey: 'ec2-state/ec2-state'
 - task: TerraformTaskV4@4
