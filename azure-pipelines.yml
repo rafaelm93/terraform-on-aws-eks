@@ -9,10 +9,6 @@ pool:
 steps:
 - checkout: self
 
-- task: TerraformInstaller@0
-  inputs:
-    terraformVersion: 'latest'
-
 - task: TerraformTaskV4@4
   inputs:
     provider: 'aws'
